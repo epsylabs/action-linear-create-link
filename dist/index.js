@@ -2901,7 +2901,7 @@ const main = async () => {
         }
         else if (inputs.scope == "project") {
             let project = await linearClient.project(inputs.resource);
-            console.log(project.links());
+            console.log(await project.links());
         }
         // const teams: Team[] = await getTeams(linearClient);
         // if (!teams.length) {
