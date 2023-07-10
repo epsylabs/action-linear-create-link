@@ -1,0 +1,29 @@
+name: "Create a linear link attached to Project or Issue"
+description: "Create a linear link attached to specified resource"
+inputs:
+  linear-api-key:
+    description: "Linear API key generated from https://linear.app/settings/api . (e.g. `lin_api_*)`"
+    required: true
+
+  resource:
+    description: "Id of either issue or project"
+    required: true
+
+  scope:
+    description: "Attache link to issue|project"
+    required: true
+  name:
+    description: "Name of the link"
+    required: true
+  target:
+    description: "Target URL"
+    required: true
+
+outputs:
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: "git-pull-request"
+  color: "blue"
