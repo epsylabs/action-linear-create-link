@@ -44,72 +44,32 @@ const main = async () => {
 
     if (inputs.scope == "issue") {
       let issue = await linearClient.issue(inputs.resource);
+      if (
+        (await issue.attachments()).nodes.filter(
+          (link) => link.title == inputs.name,
+        ).length == 0
+      ) {
+        linearClient.createAttachment({
+          issueId: issue.id,
+          url: inputs.target,
+          title: inputs.name,
+        });
+      }
     } else if (inputs.scope == "project") {
       let project = await linearClient.project(inputs.resource);
-      console.log(project.links());
+
+      if (
+        (await project.links()).nodes.filter(
+          (link) => link.label == inputs.name,
+        ).length == 0
+      ) {
+        await linearClient.createProjectLink({
+          projectId: project.id,
+          label: inputs.name,
+          url: inputs.target,
+        });
+      }
     }
-
-    // const teams: Team[] = await getTeams(linearClient);
-    // if (!teams.length) {
-    //   setFailed(`No teams found in Linear workspace`);
-    //   return;
-    // }
-
-    // const teamKeys: string[] = teams.map((team) => team.key);
-    // const regexStr: string = `(?<!A-Za-z)(${teamKeys.join("|")})-(\\d+)`;
-    // const regExp: RegExp = new RegExp(regexStr, "gim");
-    // const haystack: string = Object.values(prParts)
-    //   .map(({ value, flag }) => (flag ? value : undefined))
-    //   .filter(Boolean)
-    //   .join(" ");
-    // debug(`Checking PR for identifier "${regexStr}" in "${haystack}"`);
-
-    // const matches: string[] = haystack.match(regExp) as string[];
-    // if (matches?.length) {
-    //   debug(`Found numbers: ${matches.join(", ")}`);
-
-    //   const issueNumbers: IssueNumber[] = inputs.outputMultiple
-    //     ? matches.map(matchToIssueNumber)
-    //     : [matchToIssueNumber(matches[0])];
-    //   debug(`Formatted issues: ${JSON.stringify(issueNumbers)}`);
-
-    //   const issues: Issue[] = await getIssues(linearClient, ...issueNumbers);
-    //   debug(`Linear API issues result: ${JSON.stringify(issues)}`);
-
-    //   if (issues.length) {
-    //     const extendIssues = (
-    //       rawIssues: Issue[],
-    //     ): Promise<FoundIssueType[]> => {
-    //       const promises = rawIssues.map(
-    //         async (issue): Promise<FoundIssueType> => {
-    //           return {
-    //             ...(issue as LimitedIssue),
-    //             team: inputs.withTeam ? await issue.team : null,
-    //             labels: inputs.withLabels ? (await issue.labels()).nodes : null,
-    //             project: inputs.withProject ? await issue.project : null,
-    //           };
-    //         },
-    //       );
-
-    //       return Promise.all(promises);
-    //     };
-
-    //     const foundIssues = await extendIssues(issues);
-
-    //     debug(`Updated result: ${JSON.stringify(foundIssues)}`);
-
-    //     if (inputs.outputMultiple) {
-    //       setOutput("linear-issues", JSON.stringify(foundIssues));
-    //     } else {
-    //       setOutput("linear-issue", JSON.stringify(foundIssues[0]));
-    //     }
-    //     return;
-    //   }
-
-    // setFailed(
-    //   `Failed to find Linear issue identifier in PR branch, title, or body.`,
-    // );
-    // return;
   } catch (error) {
     setFailed(`${(error as any)?.message ?? error}`);
   }
