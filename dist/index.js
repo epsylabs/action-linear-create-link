@@ -2901,7 +2901,13 @@ const main = async () => {
         }
         else if (inputs.scope == "project") {
             let project = await linearClient.project(inputs.resource);
-            console.log(await project.links());
+            if ((await project.links()).nodes.filter((link) => link.label == inputs.name).length == 0) {
+                linearClient.createProjectLink({
+                    projectId: project.id,
+                    label: inputs.name,
+                    url: inputs.target,
+                });
+            }
         }
         // const teams: Team[] = await getTeams(linearClient);
         // if (!teams.length) {
